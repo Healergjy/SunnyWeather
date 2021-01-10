@@ -38,7 +38,7 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
             if(activity instanceof WeatherActivity){
                 DrawerLayout drawerLayout=activity.findViewById(R.id.drawerLayout);
                 drawerLayout.closeDrawers();
-                ((WeatherActivity) activity).getViewModel().setLocationLng(place.getLocation().getLng());
+                 ((WeatherActivity) activity).getViewModel().setLocationLng(place.getLocation().getLng());
                 ((WeatherActivity) activity).getViewModel().setLocationLat(place.getLocation().getLat());
                 ((WeatherActivity) activity).getViewModel().setPlaceName(place.getName());
                 ((WeatherActivity) activity).refreshWeather();
@@ -47,7 +47,6 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
                 intent.putExtra("location_lng",place.getLocation().getLng());
                 intent.putExtra("location_lat",place.getLocation().getLat());
                 intent.putExtra("place_name",place.getName());
-                fragment.getViewModel().savePlace(place);
                 fragment.startActivity(intent);
                 fragment.getActivity().finish();
             }
