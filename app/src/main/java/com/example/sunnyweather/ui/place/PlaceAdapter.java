@@ -6,7 +6,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.sunnyweather.R;
@@ -16,10 +18,10 @@ import com.example.sunnyweather.ui.weather.WeatherActivity;
 import java.util.List;
 
 public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> {
-    Fragment fragment;
+    PlaceFragment fragment;
     List<Place> placeList;
 
-    public PlaceAdapter(Fragment fragment, List<Place> placeList) {
+    public PlaceAdapter(PlaceFragment fragment, List<Place> placeList) {
         this.fragment = fragment;
         this.placeList = placeList;
     }
@@ -32,11 +34,24 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
         viewHolder.itemView.setOnClickListener(v -> {
             int adapterPosition = viewHolder.getAdapterPosition();
             Place place = placeList.get(adapterPosition);
-            Intent intent = new Intent(parent.getContext(), WeatherActivity.class);
-            intent.putExtra("location_lng",place.getLocation().getLng());
-            intent.putExtra("location_lat",place.getLocation().getLat());
-            intent.putExtra("place_name",place.getName());
-            fragment.startActivity(intent);
+            FragmentActivity activity=fragment.getActivity();
+            if(activity instanceof WeatherActivity){
+                DrawerLayout drawerLayout=activity.findViewById(R.id.drawerLayout);
+                drawerLayout.closeDrawers();
+                ((WeatherActivity) activity).getViewModel().setLocationLng(place.getLocation().getLng());
+                ((WeatherActivity) activity).getViewModel().setLocationLat(place.getLocation().getLat());
+                ((WeatherActivity) activity).getViewModel().setPlaceName(place.getName());
+                ((WeatherActivity) activity).refreshWeather();
+            }else {
+                Intent intent = new Intent(parent.getContext(), WeatherActivity.class);
+                intent.putExtra("location_lng",place.getLocation().getLng());
+                intent.putExtra("location_lat",place.getLocation().getLat());
+                intent.putExtra("place_name",place.getName());
+                fragment.getViewModel().savePlace(place);
+                fragment.startActivity(intent);
+                fragment.getActivity().finish();
+            }
+            fragment.getViewModel().savePlace(place);
         });
         return viewHolder;
     }
